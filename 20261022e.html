@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>〈桃花源記〉素養導向線上測驗（只能作答一次）</title>
+
+  <!-- 字體（可刪） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&family=Noto+Serif+TC:wght@700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#fbfaf7;
+      --card:#ffffff;
+      --ink:#0f172a;
+      --muted:#64748b;
+      --primary:#0ea5a4;
+      --primary-weak:#ecfeff;
+      --danger:#ef4444;
+      --success:#16a34a;
+      --border:#e2e8f0;
+      --shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+      --r-lg:18px;
+      --r-md:12px;
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      font-family:"Noto Sans TC", system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+      line-height:1.8;
+      padding-bottom: 90px;
+    }
+    header{
+      max-width: 920px;
+      margin: 28px auto 18px;
+      padding: 0 16px;
+      text-align:center;
+    }
+    header h1{
+      font-family:"Noto Serif TC", serif;
+      margin: 10px 0 6px;
+      font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+      letter-spacing: 1px;
+    }
+    header p{
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.02rem;
+    }
+
+    .wrap{max-width: 920px; margin: 0 auto; padding: 0 16px;}
+    .card{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      margin: 16px 0;
+    }
+    .notice{
+      display:flex; gap:12px; align-items:flex-start;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color:#7c2d12;
+      border-radius: var(--r-md);
+      padding: 14px 14px;
+      margin-top: 14px;
+    }
+    .badge{
+      flex: none;
+      width: 34px; height:34px;
+      border-radius: 999px;
+      background: #fb923c;
+      color: #fff;
+      display:flex; align-items:center; justify-content:center;
+      font-weight: 800;
+    }
+    .notice b{display:block; margin-bottom: 2px;}
+    .meta{
+      display:flex; flex-wrap:wrap; gap:10px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 10px;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+
+    .q{
+      padding: 18px;
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, #fff, #fff);
+      margin-bottom: 16px;
+    }
+    .q:hover{ border-color: #99f6e4; }
+    .qhead{
+      display:flex; gap:12px; align-items:flex-start;
+      margin-bottom: 10px;
+    }
+    .qnum{
+      width: 36px; height: 36px; border-radius: 999px;
+      background: var(--primary);
+      color:#fff; font-weight:800;
+      display:flex; align-items:center; justify-content:center;
+      flex:none;
+    }
+    .qtitle{
+      font-size: 1.12rem;
+      font-weight: 800;
+      margin-top: 3px;
+    }
+    .qsrc{
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .opts{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+      margin-top: 12px;
+    }
+    @media (min-width: 760px){
+      .opts{ grid-template-columns: 1fr 1fr; }
+    }
+    label.opt{
+      position: relative;
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      padding: 12px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      background: #f8fafc;
+      cursor:pointer;
+      transition: 0.18s ease;
+      user-select: none;
+    }
+    label.opt:hover{
+      background: var(--primary-weak);
+      border-color: #5eead4;
+      transform: translateY(-1px);
+    }
+    label.opt input{
+      position:absolute;
+      opacity:0;
+      pointer-events:none;
+    }
+    .dot{
+      margin-top: 2px;
+      width: 18px; height:18px;
+      border-radius: 999px;
+      border: 2px solid #94a3b8;
+      flex:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#fff;
+    }
+    label.opt input:checked + .dot{
+      border-color: var(--primary);
+      background: var(--primary);
+      box-shadow: 0 0 0 4px rgba(14,165,164,.18);
+    }
+    .dot::after{
+      content:"";
+      width: 8px; height:8px;
+      border-radius:999px;
+      background:#fff;
+      opacity:0;
+    }
+    label.opt input:checked + .dot::after{ opacity:1; }
+    .otxt{ font-weight: 600; }
+
+    .actions{
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 12px;
+      width: calc(100% - 20px);
+      max-width: 920px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      box-shadow: 0 18px 40px rgba(15,23,42,0.14);
+      display:flex;
+      gap: 12px;
+      align-items:center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      z-index: 50;
+    }
+    .progress{
+      display:flex;
+      gap: 12px;
+      align-items:center;
+      min-width: 180px;
+    }
+    .bar{
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow:hidden;
+      flex:1;
+      min-width: 120px;
+    }
+    .bar > div{
+      height:100%;
+      width:0%;
+      background: var(--primary);
+      transition: width 0.25s ease;
+    }
+    .btn{
+      border: none;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-weight: 800;
+      cursor:pointer;
+      transition: 0.18s ease;
+      white-space: nowrap;
+    }
+    .btn-primary{
+      background: var(--ink);
+      color:#fff;
+    }
+    .btn-primary:hover{ background: var(--primary); transform: scale(1.02); }
+    .btn-ghost{
+      background:#f1f5f9;
+      color: var(--ink);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover{ background:#e2e8f0; }
+
+    .btn:disabled{
+      cursor:not-allowed;
+      background:#cbd5e1;
+      color:#475569;
+      transform:none;
+    }
+
+    .result{
+      display:none;
+      margin-top: 18px;
+      animation: fadeIn .35s ease;
+    }
+    @keyframes fadeIn{
+      from{opacity:0; transform: translateY(10px);}
+      to{opacity:1; transform: translateY(0);}
+    }
+    .score{
+      font-family:"Noto Serif TC", serif;
+      font-size: clamp(2.6rem, 5vw, 4.2rem);
+      color: var(--primary);
+      margin: 6px 0 4px;
+      font-weight: 900;
+    }
+    .rtitle{ font-size: 1.4rem; font-weight: 900; margin: 4px 0; }
+    .rmsg{ color: var(--muted); margin: 0 0 10px; }
+
+    .review{
+      margin-top: 16px;
+      border-top: 1px dashed var(--border);
+      padding-top: 14px;
+    }
+    .wrong{
+      background: #fff5f5;
+      border: 1px solid #fecaca;
+      border-left: 6px solid var(--danger);
+      border-radius: var(--r-md);
+      padding: 12px 12px;
+      margin: 10px 0;
+    }
+    .right{
+      color: var(--success);
+      font-weight: 900;
+    }
+
+    /* 自訂提示 */
+    .overlay{
+      display:none;
+      position: fixed;
+      inset: 0;
+      background: rgba(2,6,23,.65);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal{
+      max-width: 520px;
+      width: 100%;
+      background: #fff;
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      box-shadow: 0 30px 70px rgba(0,0,0,.22);
+      padding: 18px;
+    }
+    .modal h3{ margin: 0 0 8px; }
+    .modal p{ margin: 0; color: var(--muted); }
+    .modal .mact{ display:flex; justify-content:flex-end; margin-top: 12px; gap:10px; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>〈桃花源記〉素養導向線上測驗</h1>
+    <p>每題 10 分，總分 100 分｜繳交後只能作答一次</p>
+    <div class="meta">
+      <span class="pill">出題來源：〈桃花源記〉教材第11～13頁（依三段標註）</span>
+      <span class="pill">建議年段：高中</span>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="card notice">
+      <div class="badge">!</div>
+      <div>
+        <b>重要提醒（只能作答一次）</b>
+        <div>本測驗會用 <b>localStorage</b> 記錄是否已繳交。繳交後會鎖定，避免重複作答。</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <form id="quizForm"></form>
+
+      <div id="result" class="result card">
+        <div style="text-align:center;">
+          <div class="score" id="scoreText">0</div>
+          <div class="rtitle" id="resultTitle">完成</div>
+          <p class="rmsg" id="resultMsg"></p>
+        </div>
+        <div class="review" id="review"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <div class="progress">
+      <div style="font-weight:900;color:var(--primary);">作答度 <span id="doneCount">0</span>/10</div>
+      <div class="bar"><div id="barFill"></div></div>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-ghost" type="button" onclick="scrollToTop()">回到最上面</button>
+      <button id="submitBtn" class="btn btn-primary" type="button" onclick="submitQuiz()">繳交測驗卷</button>
+    </div>
+  </div>
+
+  <!-- 自訂提示視窗 -->
+  <div id="overlay" class="overlay">
+    <div class="modal">
+      <h3>提醒</h3>
+      <p id="modalMsg">訊息</p>
+      <div class="mact">
+        <button class="btn btn-primary" type="button" onclick="closeModal()">我知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <!--
+    題庫資料區（中英文安全）：
+    每題以 @@Q 開始；欄位為 id / correct / src / text / opt。
+    correct 使用 0~3，分別代表 A~D。
+    題目與選項是純文字，不放進 JavaScript 字串，因此英文的單引號、雙引號不會破壞程式。
+  -->
+  <textarea id="quizData" hidden aria-hidden="true">
+@@Q
+id=q1
+correct=1
+src=出處：第一段，教材第11頁
+text=班級討論「偶然發現」的敘事效果。哪項說法最符合漁人發現桃花源的經過？
+opt=漁人事先取得地圖，依計畫前往
+opt=漁人沿溪前行，忘記路程，意外遇見桃花林
+opt=漁人受太守命令，專程尋找桃花林
+opt=桃花源居民主動到溪邊迎接漁人
+@@Q
+id=q2
+correct=0
+src=出處：第一段，教材第11頁
+text=美術社要根據課文繪製桃花林入口，哪一幅畫面的安排最貼近原文？
+opt=兩岸桃樹成林，芳草鮮美，落花繽紛
+opt=樹種雜亂，林中遍布高樓
+opt=桃花林旁有繁忙的市集
+opt=林中沒有花草，只有乾涸河床
+@@Q
+id=q3
+correct=2
+src=出處：第一、二段，教材第11～12頁
+text=校園導覽要模擬漁人進入桃花源的體驗，哪種動線最符合文章的空間轉折？
+opt=先到寬闊廣場，再進入狹窄暗室
+opt=穿過熱鬧街道，再抵達溪邊
+opt=由狹窄洞口前進，突然看見開闊明亮的村落
+opt=從山頂俯瞰後，沿著大路直達村落
+@@Q
+id=q4
+correct=3
+src=出處：第二段，教材第12頁
+text=地理課請學生用課文證據判斷桃花源的生活環境，哪項推論最合理？
+opt=居民主要依靠海上貿易
+opt=村落道路完全不相通
+opt=居民生活以軍事訓練為中心
+opt=田地與道路井然，村落呈現安定的農耕生活
+@@Q
+id=q5
+correct=0
+src=出處：第二段，教材第12頁
+text=戲劇社演出桃花源居民初見漁人的場景，哪種反應最符合原文及其原因？
+opt=非常驚訝，因為長期與外界隔絕
+opt=十分憤怒，因為漁人偷走糧食
+opt=毫不意外，因為每天都有遊客來訪
+opt=立刻逃走，因為知道漁人是太守
+@@Q
+id=q6
+correct=1
+src=出處：第二段，教材第12～13頁
+text=一位同學說：「桃花源居民不知有漢，無論魏、晉，顯示他們長久不知道外界政局。」哪項原文資訊最能支持此說？
+opt=桃花林夾岸數百步
+opt=祖先避秦時亂而入絕境，從此不復出焉
+opt=漁人沿路處處作記號
+opt=劉子驥欣然規往
+@@Q
+id=q7
+correct=2
+src=出處：第二段，教材第12～13頁
+text=班級想用一句話形容桃花源居民如何接待陌生訪客，哪項最有文本依據？
+opt=要求漁人立刻離開
+opt=只讓漁人在村口等候
+opt=邀請回家，準備酒食，其他居民也接續款待
+opt=請漁人先向太守取得通行證
+@@Q
+id=q8
+correct=3
+src=出處：第二段，教材第13頁
+text=如果要為桃花源居民寫一張提醒漁人的告示，哪句最符合「不足為外人道也」的語境？
+opt=請告訴太守，讓更多官員來管理
+opt=請把這裡的道路畫成地圖
+opt=請把這裡的物產帶到城裡販售
+opt=請不要向外界透露這裡的事情
+@@Q
+id=q9
+correct=0
+src=出處：第三段，教材第13頁
+text=漁人離開後做了標記，又向太守報告。依後續情節，哪個結果最符合原文？
+opt=太守派人隨往，仍迷失而找不到原路
+opt=太守派人隨往，立即在當地設官
+opt=漁人依標記成功搬回桃花源
+opt=居民循標記出村迎接太守
+@@Q
+id=q10
+correct=1
+src=出處：第三段，教材第13頁
+text=文學社討論結尾「後遂無問津者」的效果。綜合全文，哪項解讀最合理？
+opt=證明桃花源從一開始就是郡城的一部分
+opt=讓理想而安樂的桃花源更顯神祕、難以再尋
+opt=表示桃花源居民已全部搬離
+opt=說明漁人其實從未見過桃花林
+  </textarea>
+
+  <script>
+    /***********************
+     * sample_test_v2.html
+     * 中英文通用安全版
+     * - 題庫內容放在純文字 textarea，不直接寫進 JavaScript 字串
+     * - 正確答案使用 correctIndex (0~3)
+     * - 題目/選項使用 textContent 安全渲染
+     * - 自動驗證題庫資料
+     * - 不同題庫自動產生不同 localStorage 鎖定鍵
+     ***********************/
+
+    const OPTION_LABELS = ["A", "B", "C", "D"];
+
+    function $(id){ return document.getElementById(id); }
+
+    function parseQuizData(raw){
+      const blocks = raw.replace(/\r\n?/g, "\n").split(/^@@Q\s*$/m).map(v => v.trim()).filter(Boolean);
+      return blocks.map((block, index) => {
+        const q = { id: "", text: "", src: "", options: [], correctIndex: NaN };
+        const lines = block.split("\n");
+        for (const line of lines) {
+          const eq = line.indexOf("=");
+          if (eq < 0) continue;
+          const key = line.slice(0, eq).trim();
+          const value = line.slice(eq + 1).trim();
+          if (key === "id") q.id = value;
+          else if (key === "text") q.text = value;
+          else if (key === "src") q.src = value;
+          else if (key === "opt") q.options.push(value);
+          else if (key === "correct") q.correctIndex = Number(value);
+        }
+        if (!q.id) q.id = `q${index + 1}`;
+        return q;
+      });
+    }
+
+    const QUESTIONS = parseQuizData($("quizData").value);
+
+    function showModal(msg){
+      $("modalMsg").innerText = msg;
+      $("overlay").style.display = "flex";
+    }
+
+    function closeModal(){
+      $("overlay").style.display = "none";
+    }
+
+    function scrollToTop(){
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+
+    function makeQuizId(){
+      const payload = QUESTIONS.map(q => [q.text, q.src, q.options.join("\u241f"), q.correctIndex].join("\u241e")).join("\u241d");
+      let hash = 5381;
+      for (let i = 0; i < payload.length; i++) {
+        hash = ((hash << 5) + hash) ^ payload.charCodeAt(i);
+        hash >>>= 0;
+      }
+      return `quiz_${hash.toString(16)}_once`;
+    }
+
+    const QUIZ_ID = makeQuizId();
+    const LOCK_KEY = QUIZ_ID + "_locked";
+
+    function validateQuestions(){
+      const errors = [];
+      if (!Array.isArray(QUESTIONS) || QUESTIONS.length === 0) {
+        return ["題庫不存在或沒有題目。"];
+      }
+
+      const seenIds = new Set();
+      QUESTIONS.forEach((q, index) => {
+        const n = index + 1;
+        if (!q.id) errors.push(`第 ${n} 題缺少 id。`);
+        else if (seenIds.has(q.id)) errors.push(`第 ${n} 題的 id「${q.id}」重複。`);
+        else seenIds.add(q.id);
+
+        if (!q.text) errors.push(`第 ${n} 題缺少題目文字。`);
+        if (typeof q.src !== "string") errors.push(`第 ${n} 題來源欄位錯誤。`);
+        if (!Array.isArray(q.options) || q.options.length !== 4) {
+          errors.push(`第 ${n} 題必須剛好有 4 個選項。`);
+        } else {
+          q.options.forEach((opt, i) => {
+            if (!opt) errors.push(`第 ${n} 題的選項 ${OPTION_LABELS[i]} 不完整。`);
+          });
+        }
+        if (!Number.isInteger(q.correctIndex) || q.correctIndex < 0 || q.correctIndex > 3) {
+          errors.push(`第 ${n} 題 correct 必須是 0～3 的整數。`);
+        }
+      });
+      return errors;
+    }
+
+    function appendText(parent, tagName, className, text){
+      const el = document.createElement(tagName);
+      if (className) el.className = className;
+      el.textContent = text;
+      parent.appendChild(el);
+      return el;
+    }
+
+    function renderQuiz(){
+      const form = $("quizForm");
+      form.replaceChildren();
+
+      QUESTIONS.forEach((q, idx) => {
+        const wrap = document.createElement("div");
+        wrap.className = "q";
+
+        const qhead = document.createElement("div");
+        qhead.className = "qhead";
+        appendText(qhead, "div", "qnum", String(idx + 1));
+
+        const headText = document.createElement("div");
+        appendText(headText, "div", "qtitle", q.text);
+        appendText(headText, "div", "qsrc", q.src);
+        qhead.appendChild(headText);
+        wrap.appendChild(qhead);
+
+        const opts = document.createElement("div");
+        opts.className = "opts";
+        opts.setAttribute("role", "radiogroup");
+        opts.setAttribute("aria-label", `Question ${idx + 1}`);
+
+        q.options.forEach((optionText, optIndex) => {
+          const label = document.createElement("label");
+          label.className = "opt";
+
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = q.id;
+          input.value = String(optIndex);
+
+          const dot = document.createElement("span");
+          dot.className = "dot";
+          dot.setAttribute("aria-hidden", "true");
+
+          const textSpan = document.createElement("span");
+          textSpan.className = "otxt";
+          textSpan.textContent = `${OPTION_LABELS[optIndex]}. ${optionText}`;
+
+          label.append(input, dot, textSpan);
+          opts.appendChild(label);
+        });
+
+        wrap.appendChild(opts);
+        form.appendChild(wrap);
+      });
+
+      form.querySelectorAll('input[type="radio"]').forEach(r => {
+        r.addEventListener("change", updateProgress);
+      });
+    }
+
+    function getPicked(q){
+      return Array.from(document.getElementsByName(q.id)).find(el => el.checked) || null;
+    }
+
+    function updateProgress(){
+      const checked = document.querySelectorAll('input[type="radio"]:checked').length;
+      $("doneCount").innerText = checked;
+      const pct = Math.round((checked / QUESTIONS.length) * 100);
+      $("barFill").style.width = pct + "%";
+    }
+
+    function lockQuiz(){
+      try {
+        localStorage.setItem(LOCK_KEY, "1");
+      } catch (err) {
+        console.warn("localStorage 無法寫入，將無法永久保存一次作答鎖定狀態。", err);
+      }
+    }
+
+    function isLocked(){
+      try {
+        return localStorage.getItem(LOCK_KEY) === "1";
+      } catch (err) {
+        console.warn("localStorage 無法讀取。", err);
+        return false;
+      }
+    }
+
+    function disableAll(){
+      document.querySelectorAll("input[type='radio']").forEach(el => el.disabled = true);
+      $("submitBtn").disabled = true;
+      $("submitBtn").innerText = "測驗已繳交（已鎖定）";
+    }
+
+    function createWrongReviewItem(w){
+      const box = document.createElement("div");
+      box.className = "wrong";
+
+      const line1 = document.createElement("div");
+      const strong = document.createElement("b");
+      strong.textContent = `第 ${w.num} 題`;
+      const src = document.createElement("span");
+      src.style.color = "var(--muted)";
+      src.textContent = w.src;
+      line1.append(strong, document.createTextNode("｜"), src);
+
+      const line2 = document.createElement("div");
+      line2.style.marginTop = "6px";
+      line2.textContent = `題目：${w.q}`;
+
+      const line3 = document.createElement("div");
+      line3.style.marginTop = "6px";
+      line3.textContent = `你的答案：${w.pickedLabel}（${w.pickedText}）`;
+
+      const line4 = document.createElement("div");
+      line4.style.marginTop = "6px";
+      line4.appendChild(document.createTextNode("正確答案："));
+      const right = document.createElement("span");
+      right.className = "right";
+      right.textContent = w.correctLabel;
+      line4.append(right, document.createTextNode(`（${w.correctText}）`));
+
+      box.append(line1, line2, line3, line4);
+      return box;
+    }
+
+    function submitQuiz(){
+      if (isLocked()){
+        showModal("你已經繳交過了，這份測驗設定為只能作答一次喔！");
+        disableAll();
+        return;
+      }
+
+      const errors = validateQuestions();
+      if (errors.length > 0) {
+        console.error("題庫設定錯誤：", errors);
+        showModal("題庫設定有誤，暫時無法計分。請將此訊息回報給出題者：\n\n" + errors.join("\n"));
+        return;
+      }
+
+      const missed = [];
+      QUESTIONS.forEach((q, i) => {
+        if (!getPicked(q)) missed.push(i + 1);
+      });
+
+      if (missed.length > 0){
+        showModal(`尚有題目未作答（第 ${missed.join(", ")} 題），請全部完成後再繳交。`);
+        return;
+      }
+
+      let score = 0;
+      const wrongs = [];
+
+      QUESTIONS.forEach((q, i) => {
+        const pickedIndex = Number(getPicked(q).value);
+        if (pickedIndex === q.correctIndex) {
+          score += 10;
+        } else {
+          wrongs.push({
+            num: i + 1,
+            q: q.text,
+            src: q.src,
+            pickedLabel: OPTION_LABELS[pickedIndex],
+            pickedText: q.options[pickedIndex],
+            correctLabel: OPTION_LABELS[q.correctIndex],
+            correctText: q.options[q.correctIndex]
+          });
+        }
+      });
+
+      $("scoreText").innerText = score;
+      let title = "完成！";
+      let msg = "";
+
+      if (score === 100){
+        title = "太強了！滿分！";
+        msg = "你已掌握〈桃花源記〉的情節、推論與主旨！";
+      } else if (score >= 70){
+        title = "表現很不錯！";
+        msg = "大多數重點都有抓到，錯題看一下就更完整囉。";
+      } else {
+        title = "再練一下就會更好！";
+        msg = "建議回到課文三段，複習人物行為、因果與結尾。";
+      }
+
+      $("resultTitle").innerText = title;
+      $("resultMsg").innerText = msg;
+
+      const review = $("review");
+      review.replaceChildren();
+
+      if (wrongs.length === 0){
+        const perfect = document.createElement("p");
+        perfect.style.textAlign = "center";
+        perfect.style.color = "var(--success)";
+        perfect.style.fontWeight = "900";
+        perfect.style.margin = "8px 0 0";
+        perfect.textContent = "完美作答！沒有錯題 🎉";
+        review.appendChild(perfect);
+      } else {
+        const h3 = document.createElement("h3");
+        h3.style.margin = "0 0 10px";
+        h3.textContent = "錯題回顧（含正確答案）";
+        review.appendChild(h3);
+        wrongs.forEach(w => review.appendChild(createWrongReviewItem(w)));
+      }
+
+      $("result").style.display = "block";
+      lockQuiz();
+      disableAll();
+
+      setTimeout(() => {
+        $("result").scrollIntoView({behavior:"smooth", block:"start"});
+      }, 150);
+    }
+
+    const startupErrors = validateQuestions();
+    if (startupErrors.length > 0) {
+      console.error("題庫設定錯誤：", startupErrors);
+      $("submitBtn").disabled = true;
+      $("submitBtn").innerText = "題庫設定錯誤";
+      showModal("題庫設定有誤，請出題者修正後再使用：\n\n" + startupErrors.join("\n"));
+    } else {
+      renderQuiz();
+      updateProgress();
+
+      if (isLocked()){
+        disableAll();
+        $("result").style.display = "block";
+        $("resultTitle").innerText = "已繳交（鎖定）";
+        $("resultMsg").innerText = "這份測驗設定為只能作答一次。若需要重新測驗，請由出題者建立另一份題庫版本，或清除本瀏覽器對此測驗的 localStorage 記錄。";
+      }
+    }
+  </script>
+</body>
+</html>
